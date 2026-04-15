@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JSON 다루기 연습</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+      }
+
+      .section h2 {
+        margin-bottom: 12px;
+        color: #667eea;
+      }
+
+      .section p {
+        margin-bottom: 8px;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .info-box {
+        background-color: #f0f4ff;
+        border-left: 4px solid #667eea;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 10px 0;
+        background-color: #fafafa;
+      }
+
+      .card h3 {
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      .json-display {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 14px;
+        white-space: pre-wrap;
+        word-break: break-all;
+        margin: 10px 0;
+        min-height: 60px;
+        line-height: 1.5;
+      }
+
+      .result-box {
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 10px 0;
+        min-height: 50px;
+        color: #333;
+      }
+
+      .result-box .label {
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 8px;
+      }
+
+      .user-card {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin: 8px 0;
+        background-color: #fafafa;
+      }
+
+      .user-avatar {
+        width: 50px;
+        height: 50px;
+        background-color: #667eea;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+
+      .user-info {
+        flex: 1;
+      }
+
+      .user-info .name {
+        font-weight: bold;
+        font-size: 16px;
+      }
+
+      .user-info .detail {
+        color: #666;
+        font-size: 14px;
+        margin-top: 2px;
+      }
+
+      .product-grid {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+
+      .product-item {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        width: 200px;
+        text-align: center;
+        background-color: #fafafa;
+      }
+
+      .product-item .product-name {
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+
+      .product-item .product-price {
+        color: #e74c3c;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .product-item .product-category {
+        color: #888;
+        font-size: 13px;
+        margin-top: 4px;
+      }
+
+      .warning-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 10px 0;
+      }
+
+      .compare-grid .compare-col {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .compare-grid .compare-col h4 {
+        margin-bottom: 8px;
+        color: #667eea;
+      }
+
+      .compare-grid .compare-col .output {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 13px;
+        white-space: pre-wrap;
+        word-break: break-all;
+        background: #f5f5f5;
+        padding: 8px;
+        border-radius: 4px;
+        min-height: 40px;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button:hover {
+        background-color: #5568d3;
+      }
+
+      .btn-group {
+        margin-top: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>JSON 다루기 연습</h1>
+      <p class="description">
+        JSON(JavaScript Object Notation)은 데이터를 주고받을 때 사용하는 텍스트
+        형식입니다.<br />
+        이 실습에서는 JSON.stringify(), JSON.parse()를 사용해 데이터를 변환하고
+        처리하는 방법을 연습합니다.
+      </p>
+
+      <!-- 섹션 1: JSON.stringify() - 객체를 JSON 문자열로 -->
+      <div class="section">
+        <h2>섹션 1: JSON.stringify() — 객체를 JSON 문자열로</h2>
+        <p>
+          자바스크립트 객체를 JSON 문자열로 변환합니다. HTTP 통신에서는 문자열만
+          전송할 수 있기 때문에, 서버로 데이터를 보낼 때 반드시 문자열화가
+          필요합니다.
+        </p>
+        <div class="info-box">
+          💡 <strong>왜 문자열로 바꿔야 할까?</strong><br />
+          HTTP 프로토콜은 '문자열'만 통과할 수 있어요. 자바스크립트 객체를 직접
+          보낼 수 없기 때문에 JSON.stringify()로 문자열화를 시켜야 합니다.
+        </div>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <h4>원본 객체 (typeof: object)</h4>
+            <div class="output" id="section1-object">
+              여기에 원본 객체가 표시됩니다.
+            </div>
+          </div>
+          <div class="compare-col">
+            <h4>JSON 문자열 (typeof: string)</h4>
+            <div class="output" id="section1-json">
+              여기에 JSON 문자열이 표시됩니다.
+            </div>
+          </div>
+        </div>
+        <div class="json-display" id="section1-pretty">
+          보기 좋게 포맷팅된 JSON이 여기에 표시됩니다.
+        </div>
+        <div class="btn-group">
+          <button onclick="test1()">테스트 1: JSON.stringify()</button>
+        </div>
+      </div>
+
+      <!-- 섹션 2: JSON.parse() - JSON 문자열을 객체로 -->
+      <div class="section">
+        <h2>섹션 2: JSON.parse() — JSON 문자열을 객체로</h2>
+        <p>
+          JSON 문자열을 자바스크립트 객체로 변환합니다. 서버에서 받은 데이터를
+          사용하려면 파싱이 필요합니다.
+        </p>
+        <div class="card">
+          <h3>서버에서 받은 JSON 문자열 (가정)</h3>
+          <div class="json-display" id="section2-raw">
+            {"name":"홍길동","age":30,"email":"hong@example.com","isActive":true}
+          </div>
+        </div>
+        <div class="result-box">
+          <div class="label">파싱 결과</div>
+          <div id="section2-result">
+            테스트 버튼을 눌러 파싱 결과를 확인하세요.
+          </div>
+        </div>
+        <div class="btn-group">
+          <button onclick="test2()">테스트 2: JSON.parse()</button>
+        </div>
+      </div>
+
+      <!-- 섹션 3: 배열 JSON 변환 -->
+      <div class="section">
+        <h2>섹션 3: 배열 JSON 변환</h2>
+        <p>
+          배열도 JSON으로 변환할 수 있습니다. 사용자 목록을 JSON으로 변환하고,
+          다시 배열로 복원해봅니다.
+        </p>
+        <div id="section3-users" style="margin-bottom: 12px">
+          <p style="color: #999">
+            테스트 버튼을 누르면 사용자 카드가 표시됩니다.
+          </p>
+        </div>
+        <div class="json-display" id="section3-json">
+          배열이 JSON 문자열로 변환된 결과가 여기에 표시됩니다.
+        </div>
+        <div class="btn-group">
+          <button onclick="test3()">테스트 3: 배열 변환</button>
+        </div>
+      </div>
+
+      <!-- 섹션 4: 중첩 객체 JSON 다루기 -->
+      <div class="section">
+        <h2>섹션 4: 중첩 객체 JSON 다루기</h2>
+        <p>
+          중첩된 객체도 JSON으로 변환 후 다시 파싱하면 원래대로 접근할 수
+          있습니다.
+        </p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <h4>주문 정보</h4>
+            <div id="section4-order" class="output">
+              테스트 버튼을 눌러 주문 정보를 확인하세요.
+            </div>
+          </div>
+          <div class="compare-col">
+            <h4>주소 정보</h4>
+            <div id="section4-address" class="output">
+              테스트 버튼을 눌러 주소 정보를 확인하세요.
+            </div>
+          </div>
+        </div>
+        <div class="product-grid" id="section4-products">
+          <div class="product-item">
+            <div class="product-name">상품 준비중</div>
+            <div class="product-price">-</div>
+            <div class="product-category">테스트 버튼을 눌러주세요</div>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button onclick="test4()">테스트 4: 중첩 객체</button>
+        </div>
+      </div>
+
+      <!-- 섹션 5: JSON 변환 주의사항 -->
+      <div class="section">
+        <h2>섹션 5: JSON 변환 주의사항</h2>
+        <p>JSON 변환 시 Date, 함수, undefined 등은 특별한 주의가 필요합니다.</p>
+        <div class="warning-box">
+          ⚠️ Date 객체는 문자열로 변환되고, 함수는 사라지며, undefined인 속성은
+          제거됩니다!
+        </div>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <h4>변환 전 (원본 타입)</h4>
+            <div class="output" id="section5-before">
+              테스트 버튼을 눌러 확인하세요.
+            </div>
+          </div>
+          <div class="compare-col">
+            <h4>JSON 변환 후 (복원된 타입)</h4>
+            <div class="output" id="section5-after">
+              테스트 버튼을 눌러 확인하세요.
+            </div>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button onclick="test5()">테스트 5: 주의사항</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

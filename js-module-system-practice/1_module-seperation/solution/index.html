@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>모듈 분리하기 실습</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+      }
+
+      .section h2 {
+        margin-bottom: 12px;
+        color: #667eea;
+      }
+
+      .section > p {
+        margin-bottom: 8px;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .info-box {
+        background-color: #f0f4ff;
+        border-left: 4px solid #667eea;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .info-box code {
+        background-color: #e8ecf8;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+
+      .warning-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .file-tree {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        margin: 12px 0;
+        white-space: pre;
+      }
+
+      .before-code {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 12px 0;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .result-box {
+        min-height: 60px;
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        line-height: 1.8;
+        font-size: 15px;
+        color: #333;
+      }
+
+      .result-box .label {
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 8px;
+      }
+
+      .log-area {
+        min-height: 80px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        margin: 16px 0;
+      }
+
+      .product-card {
+        padding: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .product-card.loaded {
+        border-color: #667eea;
+        background-color: #f8f9ff;
+      }
+
+      .product-card .name {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .product-card .price {
+        color: #e74c3c;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 4px;
+      }
+
+      .product-card .category {
+        color: #888;
+        font-size: 13px;
+        margin-top: 4px;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button:hover {
+        background-color: #5568d3;
+      }
+
+      .btn-group {
+        margin-top: 12px;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+      }
+
+      .btn-secondary:hover {
+        background-color: #565e64;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>모듈 분리하기 실습</h1>
+      <p class="description">
+        하나의 파일에 모든 코드가 들어있는 상태에서, 기능별로 파일을 나누고
+        <code>export</code> / <code>import</code>를 사용해 연결하는 실습입니다.<br />
+        각 섹션의 안내를 따라 js/ 폴더 안의 파일들을 완성하세요.
+      </p>
+
+      <!-- 파일 구조 안내 -->
+      <div class="section">
+        <h2>파일 구조</h2>
+        <p>이번 실습에서 작업할 파일들입니다.</p>
+        <div class="file-tree">1_module-seperation/
+├── index.html              ← 지금 보고 있는 파일
+├── js/
+│   ├── main.js             ← 메인 실행 파일 (import 작성)
+│   ├── utils/
+│   │   └── math.js         ← 계산 함수 (export 작성)
+│   ├── data/
+│   │   └── products.js     ← 상품 데이터 (export 작성)
+│   └── ui/
+│       └── render.js       ← 화면 표시 함수 (export 작성)
+</div>
+        <div class="info-box">
+          <code>index.html</code>은 이미 <code>&lt;script type="module" src="js/main.js"&gt;</code>로 연결되어 있습니다.<br />
+          여러분은 <strong>js/ 폴더 안의 4개 파일</strong>만 수정하면 됩니다.
+        </div>
+      </div>
+
+      <!-- 분리 전 코드 (참고용) -->
+      <div class="section">
+        <h2>분리 전 코드 (참고용)</h2>
+        <p>아래는 하나의 파일에 모든 코드가 들어있는 상태입니다. 이 코드를 모듈로 분리하는 것이 이번 실습의 목표입니다.</p>
+        <div class="warning-box">
+          이 코드를 직접 수정할 필요는 없어요! 어떤 코드를 어떤 파일로 옮길지 참고만 하세요.
+        </div>
+        <div class="before-code">// ===== 계산 관련 함수 =====
+function formatPrice(price) {
+  return price.toLocaleString() + '원';
+}
+
+function calculateDiscount(price, percent) {
+  return price - price * (percent / 100);
+}
+
+// ===== 상품 데이터 =====
+const products = [
+  { id: 1, name: '노트북',  price: 1200000, category: '전자기기' },
+  { id: 2, name: '마우스',  price: 35000,   category: '주변기기' },
+  { id: 3, name: '키보드',  price: 89000,   category: '주변기기' },
+  { id: 4, name: '모니터',  price: 350000,  category: '전자기기' },
+  { id: 5, name: 'USB 허브', price: 25000,   category: '주변기기' },
+];
+
+// ===== 화면 표시 함수 =====
+function renderProduct(product) {
+  return `${product.name} - ${formatPrice(product.price)}`;
+}
+
+function renderProductList(targetId, productList) {
+  const el = document.getElementById(targetId);
+  el.innerHTML = productList.map(p =&gt; `
+    &lt;div class="product-card loaded"&gt;
+      &lt;div class="name"&gt;${p.name}&lt;/div&gt;
+      &lt;div class="price"&gt;${formatPrice(p.price)}&lt;/div&gt;
+      &lt;div class="category"&gt;${p.category}&lt;/div&gt;
+    &lt;/div&gt;
+  `).join('');
+}
+
+// ===== 실행 =====
+console.log(renderProduct(products[0]));
+renderProductList('grid', products);</div>
+      </div>
+
+      <!-- 섹션 1: export + import -->
+      <div class="section">
+        <h2>섹션 1: export + import — utils/math.js</h2>
+        <p>두 파일을 수정합니다:</p>
+        <p>1. <code>js/utils/math.js</code>를 열고 함수에 <code>export</code>를 붙이세요.</p>
+        <p>2. <code>js/main.js</code>를 열고 math.js에서 함수를 <code>import</code> 하세요.</p>
+        <div class="info-box">
+          <strong>export</strong> — 함수 앞에 <code>export</code>를 붙이면 다른 파일에서 가져다 쓸 수 있어요.<br />
+          예: <code>export function add(a, b) { return a + b; }</code><br /><br />
+          <strong>import</strong> — <code>import { 함수명 } from './경로/파일.js';</code> 형태로 가져와요.<br />
+          예: <code>import { add } from './utils/math.js';</code>
+        </div>
+        <div class="log-area" id="log1">테스트 버튼을 눌러 결과를 확인하세요.</div>
+        <div class="btn-group">
+          <button onclick="test1()">테스트 1: math.js export + import 확인</button>
+          <button class="btn-secondary" onclick="clearLog('log1')">초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 2: 데이터 모듈 -->
+      <div class="section">
+        <h2>섹션 2: 데이터 모듈 — data/products.js</h2>
+        <p>1. <code>js/data/products.js</code>를 열고 상품 배열에 <code>export</code>를 붙이세요.</p>
+        <p>2. <code>js/main.js</code>에서 products를 <code>import</code> 하세요.</p>
+        <div class="info-box">
+          변수도 함수처럼 <code>export</code> 할 수 있어요.<br />
+          예: <code>export const items = [...];</code>
+        </div>
+        <div class="log-area" id="log2">테스트 버튼을 눌러 결과를 확인하세요.</div>
+        <div class="btn-group">
+          <button onclick="test2()">테스트 2: products.js 확인</button>
+          <button class="btn-secondary" onclick="clearLog('log2')">초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 3: UI 모듈 -->
+      <div class="section">
+        <h2>섹션 3: UI 모듈 — ui/render.js</h2>
+        <p>1. <code>js/ui/render.js</code>를 열고 함수에 <code>export</code>를 붙이세요.</p>
+        <p>2. render.js 안에서 math.js의 <code>formatPrice</code>를 <code>import</code> 하세요.</p>
+        <p>3. <code>js/main.js</code>에서 render.js의 함수를 <code>import</code> 하세요.</p>
+        <div class="info-box">
+          모듈끼리도 서로 <code>import</code> 할 수 있어요!<br />
+          render.js 안에서: <code>import { formatPrice } from '../utils/math.js';</code>
+        </div>
+        <div class="product-grid" id="product-grid">
+          <div class="product-card"><span style="color:#ccc">테스트 버튼을 눌러주세요</span></div>
+        </div>
+        <div class="log-area" id="log3">테스트 버튼을 눌러 결과를 확인하세요.</div>
+        <div class="btn-group">
+          <button onclick="test3()">테스트 3: render.js 확인</button>
+          <button class="btn-secondary" onclick="clearLog('log3')">초기화</button>
+        </div>
+      </div>
+
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

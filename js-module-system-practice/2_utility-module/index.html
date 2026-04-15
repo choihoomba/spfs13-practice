@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>유틸리티 모듈 만들기 실습</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+      }
+
+      .section h2 {
+        margin-bottom: 12px;
+        color: #667eea;
+      }
+
+      .section > p {
+        margin-bottom: 8px;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .info-box {
+        background-color: #f0f4ff;
+        border-left: 4px solid #667eea;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .info-box code {
+        background-color: #e8ecf8;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+
+      .warning-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .file-tree {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        margin: 12px 0;
+        white-space: pre;
+      }
+
+      .before-code {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 12px 0;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .log-area {
+        min-height: 80px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button:hover {
+        background-color: #5568d3;
+      }
+
+      .btn-group {
+        margin-top: 12px;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+      }
+
+      .btn-secondary:hover {
+        background-color: #565e64;
+      }
+
+      .compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+        font-size: 14px;
+      }
+
+      .compare-table th,
+      .compare-table td {
+        border: 1px solid #e0e0e0;
+        padding: 10px 14px;
+        text-align: left;
+      }
+
+      .compare-table th {
+        background-color: #667eea;
+        color: white;
+      }
+
+      .compare-table tr:nth-child(even) {
+        background-color: #f8f9ff;
+      }
+
+      .compare-table code {
+        background-color: #e8ecf8;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>유틸리티 모듈 만들기 실습</h1>
+      <p class="description">
+        <code>export default</code>와 <code>named export</code>를 활용하여
+        재사용 가능한 유틸리티 모듈을 만드는 실습입니다.<br />
+        각 섹션의 안내를 따라 js/ 폴더 안의 파일들을 완성하세요.
+      </p>
+
+      <!-- 파일 구조 안내 -->
+      <div class="section">
+        <h2>파일 구조</h2>
+        <p>이번 실습에서 작업할 파일들입니다.</p>
+        <div class="file-tree">2_utility-module/
+├── index.html                ← 지금 보고 있는 파일
+├── js/
+│   ├── main.js               ← 메인 실행 파일 (import 작성)
+│   ├── greet.js              ← 인사 함수 (default export)
+│   ├── config.js             ← 설정 객체 (default export)
+│   ├── math-utils.js         ← 수학 유틸 함수들 (named export)
+│   └── string-utils.js       ← 문자열 유틸 (default + named 혼합)
+</div>
+        <div class="info-box">
+          <code>index.html</code>은 이미 <code>&lt;script type="module" src="js/main.js"&gt;</code>로 연결되어 있습니다.<br />
+          여러분은 <strong>js/ 폴더 안의 5개 파일</strong>만 수정하면 됩니다.
+        </div>
+      </div>
+
+      <!-- named vs default 비교표 -->
+      <div class="section">
+        <h2>참고: named export vs default export</h2>
+        <table class="compare-table">
+          <tr>
+            <th>구분</th>
+            <th>named export</th>
+            <th>default export</th>
+          </tr>
+          <tr>
+            <td>개수</td>
+            <td>여러 개 가능</td>
+            <td><strong>파일당 1개만</strong></td>
+          </tr>
+          <tr>
+            <td>내보내기</td>
+            <td><code>export function add() {}</code></td>
+            <td><code>export default function add() {}</code></td>
+          </tr>
+          <tr>
+            <td>가져오기</td>
+            <td><code>import { add } from '...'</code></td>
+            <td><code>import add from '...'</code></td>
+          </tr>
+          <tr>
+            <td>중괄호</td>
+            <td><strong>필요 <code>{ }</code></strong></td>
+            <td><strong>필요 없음</strong></td>
+          </tr>
+          <tr>
+            <td>이름 변경</td>
+            <td><code>as</code> 키워드 필요</td>
+            <td><strong>자유롭게 가능</strong></td>
+          </tr>
+          <tr>
+            <td>비유</td>
+            <td>메뉴판에서 골라 주문</td>
+            <td>대표 메뉴 주세요</td>
+          </tr>
+        </table>
+        <div class="info-box">
+          <strong>외우는 팁:</strong> default = "대표" = 하나니까 그냥 쓰기, named = "이름표" = 여러 개니까 <code>{ }</code>로 골라쓰기
+        </div>
+      </div>
+
+      <!-- 섹션 1: default export 기본 -->
+      <div class="section">
+        <h2>섹션 1: default export — greet.js</h2>
+        <p>1. <code>js/greet.js</code>를 열고 함수에 <code>export default</code>를 붙이세요.</p>
+        <p>2. <code>js/main.js</code>에서 greet.js의 함수를 <code>import</code> 하세요.</p>
+        <div class="info-box">
+          <strong>export default</strong> — 파일의 "대표 선수"를 지정합니다. 파일당 1개만 가능해요.<br />
+          예: <code>export default function greet(name) { ... }</code><br /><br />
+          <strong>import</strong> — default export는 <strong>중괄호 없이</strong> 가져옵니다.<br />
+          예: <code>import greet from './greet.js';</code>
+        </div>
+        <div class="warning-box">
+          주의! default export를 가져올 때 <code>{ }</code>를 쓰면 에러가 납니다!<br />
+          <code>import { greet } from './greet.js';</code> ← 이러면 안 돼요!
+        </div>
+        <div class="log-area" id="log1">테스트 버튼을 눌러 결과를 확인하세요.</div>
+        <div class="btn-group">
+          <button onclick="test1()">테스트 1: default export 확인</button>
+          <button class="btn-secondary" onclick="clearLog('log1')">초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 2: default export 이름 자유 변경 + 객체 -->
+      <div class="section">
+        <h2>섹션 2: 객체 default export — config.js</h2>
+        <p>1. <code>js/config.js</code>를 열고 설정 객체에 <code>export default</code>를 붙이세요.</p>
+        <p>2. <code>js/main.js</code>에서 config.js의 객체를 <code>import</code> 하세요.</p>
+        <div class="info-box">
+          함수뿐 아니라 <strong>객체</strong>도 default export 할 수 있어요!<br />
+          예: <code>export default { siteName: '블로그', theme: 'dark' };</code><br /><br />
+          default export는 import 할 때 <strong>이름을 자유롭게</strong> 정할 수 있어요.<br />
+          예: <code>import siteConfig from './config.js';</code> — 원래 이름과 달라도 OK!
+        </div>
+        <div class="log-area" id="log2">테스트 버튼을 눌러 결과를 확인하세요.</div>
+        <div class="btn-group">
+          <button onclick="test2()">테스트 2: 객체 default export 확인</button>
+          <button class="btn-secondary" onclick="clearLog('log2')">초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 3: named export 유틸리티 -->
+      <div class="section">
+        <h2>섹션 3: named export — math-utils.js</h2>
+        <p>1. <code>js/math-utils.js</code>를 열고 함수와 상수에 <code>export</code>를 붙이세요.</p>
+        <p>2. <code>js/main.js</code>에서 필요한 함수와 상수를 <code>import</code> 하세요.</p>
+        <div class="info-box">
+          파일에 기능이 여러 개일 때는 <strong>named export</strong>가 편리해요.<br />
+          예: <code>export function add(a, b) { ... }</code><br />
+          가져올 때: <code>import { add, subtract } from './math-utils.js';</code><br /><br />
+          named export는 이름이 고정이라 <strong>중괄호 <code>{ }</code> 안에 정확한 이름</strong>을 써야 해요.
+        </div>
+        <div class="log-area" id="log3">테스트 버튼을 눌러 결과를 확인하세요.</div>
+        <div class="btn-group">
+          <button onclick="test3()">테스트 3: named export 확인</button>
+          <button class="btn-secondary" onclick="clearLog('log3')">초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 4: default + named 혼합 -->
+      <div class="section">
+        <h2>섹션 4: default + named 혼합 — string-utils.js</h2>
+        <p>1. <code>js/string-utils.js</code>를 열고 대표 함수에 <code>export default</code>, 나머지에 <code>export</code>를 붙이세요.</p>
+        <p>2. <code>js/main.js</code>에서 default와 named를 <strong>한 줄에</strong> 가져오세요.</p>
+        <div class="info-box">
+          한 파일에서 <strong>default 1개 + named 여러 개</strong>를 동시에 내보낼 수 있어요!<br />
+          가져올 때: <code>import formatName, { toUpperCase, addExclamation } from './string-utils.js';</code><br /><br />
+          <strong>순서 주의!</strong> default가 항상 앞에, named가 뒤에 와야 해요.
+        </div>
+        <div class="warning-box">
+          <code>import formatName, { toUpperCase } from '...';</code> — 올바른 순서!<br />
+          <code>import { toUpperCase }, formatName from '...';</code> — 에러!
+        </div>
+        <div class="log-area" id="log4">테스트 버튼을 눌러 결과를 확인하세요.</div>
+        <div class="btn-group">
+          <button onclick="test4()">테스트 4: 혼합 export 확인</button>
+          <button class="btn-secondary" onclick="clearLog('log4')">초기화</button>
+        </div>
+      </div>
+
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>데이터 생성/수정/삭제 (POST, PUT, PATCH, DELETE)</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+      }
+
+      .section h2 {
+        margin-bottom: 12px;
+        color: #667eea;
+      }
+
+      .section > p {
+        margin-bottom: 8px;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .info-box {
+        background-color: #f0f4ff;
+        border-left: 4px solid #667eea;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .info-box code {
+        background-color: #e8ecf8;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+
+      .warning-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .log-area {
+        min-height: 120px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .result-box {
+        min-height: 60px;
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        line-height: 1.8;
+        font-size: 15px;
+        color: #333;
+      }
+
+      .result-box .label {
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 8px;
+      }
+
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 10px 0;
+      }
+
+      .compare-grid .compare-col {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .compare-grid .compare-col h4 {
+        margin-bottom: 8px;
+        color: #667eea;
+      }
+
+      .compare-grid .compare-col .output {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 13px;
+        white-space: pre-wrap;
+        word-break: break-all;
+        background: #f5f5f5;
+        padding: 8px;
+        border-radius: 4px;
+        min-height: 40px;
+      }
+
+      .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 12px;
+        color: #667eea;
+        font-weight: bold;
+      }
+
+      .loading-spinner.show {
+        display: block;
+      }
+
+      .post-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 10px 0;
+        background-color: #fafafa;
+        transition: all 0.3s;
+      }
+
+      .post-card.created {
+        border-color: #27ae60;
+        background-color: #f0fff4;
+      }
+
+      .post-card.updated {
+        border-color: #f39c12;
+        background-color: #fffbf0;
+      }
+
+      .post-card.deleted {
+        border-color: #e74c3c;
+        background-color: #fff5f5;
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+
+      .post-card .post-title {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 6px;
+      }
+
+      .post-card .post-body {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 6px;
+      }
+
+      .post-card .post-meta {
+        font-size: 12px;
+        color: #999;
+      }
+
+      .method-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        margin-right: 4px;
+      }
+
+      .method-badge.post {
+        background-color: #27ae60;
+      }
+
+      .method-badge.put {
+        background-color: #f39c12;
+      }
+
+      .method-badge.patch {
+        background-color: #e67e22;
+      }
+
+      .method-badge.delete {
+        background-color: #e74c3c;
+      }
+
+      .crud-board {
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 16px 0;
+      }
+
+      .crud-board .board-header {
+        background-color: #667eea;
+        color: white;
+        padding: 12px 16px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .crud-board .board-body {
+        padding: 16px;
+        min-height: 100px;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button:hover {
+        background-color: #5568d3;
+      }
+
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .btn-group {
+        margin-top: 12px;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+      }
+
+      .btn-secondary:hover {
+        background-color: #565e64;
+      }
+
+      .btn-success {
+        background-color: #27ae60;
+      }
+
+      .btn-success:hover {
+        background-color: #219a52;
+      }
+
+      .btn-warning {
+        background-color: #f39c12;
+      }
+
+      .btn-warning:hover {
+        background-color: #d68910;
+      }
+
+      .btn-danger {
+        background-color: #e74c3c;
+      }
+
+      .btn-danger:hover {
+        background-color: #c0392b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>데이터 생성/수정/삭제 (POST, PUT, PATCH, DELETE)</h1>
+      <p class="description">
+        fetch()의 두 번째 인자에 옵션 객체를 전달하면 GET 이외의 HTTP 메서드를
+        사용할 수 있습니다.<br />
+        이 실습에서는 JSONPlaceholder API로 게시물을 생성, 수정, 삭제하는 CRUD
+        작업을 연습합니다.
+      </p>
+
+      <!-- API 안내 -->
+      <div class="section">
+        <h2>📦 fetch 옵션 구조</h2>
+        <p>GET 이외의 요청에는 method, headers, body를 설정해야 합니다.</p>
+        <div class="info-box">
+          <code>method</code> → HTTP 메서드 (<code>'POST'</code>,
+          <code>'PUT'</code>, <code>'PATCH'</code>, <code>'DELETE'</code>)<br />
+          <code>headers</code> →
+          <code>{ 'Content-Type': 'application/json' }</code> (JSON 전송 시
+          필수)<br />
+          <code>body</code> → <code>JSON.stringify(데이터)</code> (전송할
+          데이터를 JSON 문자열로)<br />
+          <br />
+          기본 URL: <code>https://jsonplaceholder.typicode.com</code>
+        </div>
+        <div class="warning-box">
+          ⚠️ JSONPlaceholder는 테스트용 API입니다. POST/PUT/DELETE 요청을 보내면
+          <strong>응답은 오지만 실제로 서버 데이터가 변경되지는 않습니다</strong
+          >. 실제 서버와 동일한 형태의 응답을 돌려주므로 연습용으로 적합합니다.
+        </div>
+      </div>
+
+      <!-- 섹션 1: POST - 게시물 생성 -->
+      <div class="section">
+        <h2><span class="method-badge post">POST</span> 섹션 1: 게시물 생성</h2>
+        <p>
+          POST 요청으로 새 게시물을 생성합니다. method, headers, body를 모두
+          설정해야 합니다.
+        </p>
+        <div class="post-card" id="section1-card">
+          <div class="post-title">새 게시물이 여기에 표시됩니다</div>
+          <div class="post-body">테스트 버튼을 눌러 게시물을 생성하세요.</div>
+          <div class="post-meta">-</div>
+        </div>
+        <div class="log-area" id="log1">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button class="btn-success" onclick="test1()">
+            테스트 1: 게시물 생성 (POST)
+          </button>
+          <button class="btn-secondary" onclick="clearLog('log1')">
+            로그 초기화
+          </button>
+        </div>
+      </div>
+
+      <!-- 섹션 2: POST - 사용자 생성 (에러 처리) -->
+      <div class="section">
+        <h2>
+          <span class="method-badge post">POST</span> 섹션 2: 사용자 생성 + 에러
+          처리
+        </h2>
+        <p>POST 요청에 try/catch를 결합하여 안전하게 데이터를 생성합니다.</p>
+        <div class="loading-spinner" id="loading2">⏳ 사용자 생성 중...</div>
+        <div class="result-box">
+          <div class="label">생성된 사용자</div>
+          <div id="section2-result">
+            테스트 버튼을 눌러 사용자를 생성하세요.
+          </div>
+        </div>
+        <div class="log-area" id="log2">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button class="btn-success" onclick="test2()">
+            테스트 2: 사용자 생성
+          </button>
+          <button class="btn-secondary" onclick="clearLog('log2')">
+            로그 초기화
+          </button>
+        </div>
+      </div>
+
+      <!-- 섹션 3: PUT - 전체 수정 -->
+      <div class="section">
+        <h2>
+          <span class="method-badge put">PUT</span> 섹션 3: 게시물 전체 수정
+        </h2>
+        <p>
+          PUT 요청은 리소스를 통째로 교체합니다. 수정할 데이터의 모든 필드를
+          보내야 합니다.
+        </p>
+        <div class="post-card" id="section3-card">
+          <div class="post-title">수정할 게시물</div>
+          <div class="post-body">테스트 버튼을 눌러 게시물을 수정하세요.</div>
+          <div class="post-meta">-</div>
+        </div>
+        <div class="log-area" id="log3">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button class="btn-warning" onclick="test3()">
+            테스트 3: 게시물 전체 수정 (PUT)
+          </button>
+          <button class="btn-secondary" onclick="clearLog('log3')">
+            로그 초기화
+          </button>
+        </div>
+      </div>
+
+      <!-- 섹션 4: PATCH - 일부 수정 + PUT vs PATCH 비교 -->
+      <div class="section">
+        <h2>
+          <span class="method-badge patch">PATCH</span> 섹션 4: 일부 수정 + PUT
+          vs PATCH 비교
+        </h2>
+        <p>
+          PATCH 요청은 리소스의 일부 필드만 수정합니다. PUT과의 차이를
+          비교해봅니다.
+        </p>
+        <div class="info-box">
+          💡 <strong>PUT vs PATCH</strong><br />
+          PUT: 전체 데이터를 교체 (보내지 않은 필드는 사라질 수 있음)<br />
+          PATCH: 보낸 필드만 수정 (나머지 필드는 유지)
+        </div>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <h4>PUT 결과 (전체 교체)</h4>
+            <div class="output" id="section4-put">
+              테스트 버튼을 눌러 비교하세요.
+            </div>
+          </div>
+          <div class="compare-col">
+            <h4>PATCH 결과 (일부 수정)</h4>
+            <div class="output" id="section4-patch">
+              테스트 버튼을 눌러 비교하세요.
+            </div>
+          </div>
+        </div>
+        <div class="log-area" id="log4">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button class="btn-warning" onclick="test4()">
+            테스트 4: PUT vs PATCH 비교
+          </button>
+          <button class="btn-secondary" onclick="clearLog('log4')">
+            로그 초기화
+          </button>
+        </div>
+      </div>
+
+      <!-- 섹션 5: DELETE - 데이터 삭제 -->
+      <div class="section">
+        <h2>
+          <span class="method-badge delete">DELETE</span> 섹션 5: 게시물 삭제
+        </h2>
+        <p>
+          DELETE 요청으로 게시물을 삭제합니다. body 없이 method만 설정하면
+          됩니다.
+        </p>
+        <div class="post-card" id="section5-card">
+          <div class="post-title">삭제할 게시물 (ID: 1)</div>
+          <div class="post-body">이 게시물이 삭제됩니다.</div>
+          <div class="post-meta">userId: 1</div>
+        </div>
+        <div class="log-area" id="log5">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button class="btn-danger" onclick="test5()">
+            테스트 5: 게시물 삭제 (DELETE)
+          </button>
+          <button class="btn-secondary" onclick="clearLog('log5')">
+            로그 초기화
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

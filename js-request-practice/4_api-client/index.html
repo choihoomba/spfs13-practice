@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API 클라이언트 만들기</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+      }
+
+      .section h2 {
+        margin-bottom: 12px;
+        color: #667eea;
+      }
+
+      .section > p {
+        margin-bottom: 8px;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .info-box {
+        background-color: #f0f4ff;
+        border-left: 4px solid #667eea;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .info-box code {
+        background-color: #e8ecf8;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+
+      .warning-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .log-area {
+        min-height: 120px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .result-box {
+        min-height: 60px;
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        line-height: 1.8;
+        font-size: 15px;
+        color: #333;
+      }
+
+      .result-box .label {
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 8px;
+      }
+
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 10px 0;
+      }
+
+      .compare-grid .compare-col {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .compare-grid .compare-col h4 {
+        margin-bottom: 8px;
+        color: #667eea;
+      }
+
+      .compare-grid .compare-col .output {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 13px;
+        white-space: pre-wrap;
+        word-break: break-all;
+        background: #f5f5f5;
+        padding: 8px;
+        border-radius: 4px;
+        min-height: 40px;
+      }
+
+      .code-preview {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Courier New", Courier, monospace;
+        font-size: 13px;
+        white-space: pre;
+        overflow-x: auto;
+        margin: 10px 0;
+        line-height: 1.6;
+      }
+
+      .code-preview .keyword {
+        color: #c586c0;
+      }
+
+      .code-preview .string {
+        color: #ce9178;
+      }
+
+      .code-preview .comment {
+        color: #6a9955;
+      }
+
+      .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 12px;
+        color: #667eea;
+        font-weight: bold;
+      }
+
+      .loading-spinner.show {
+        display: block;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+        margin: 16px 0;
+      }
+
+      .user-card {
+        padding: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.3s;
+      }
+
+      .user-card.loaded {
+        border-color: #667eea;
+        background-color: #f8f9ff;
+      }
+
+      .user-card .name {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .user-card .email {
+        font-size: 13px;
+        color: #888;
+        margin-top: 4px;
+      }
+
+      .user-card .detail {
+        font-size: 13px;
+        color: #666;
+        margin-top: 4px;
+      }
+
+      .step-indicator {
+        display: flex;
+        gap: 8px;
+        margin: 12px 0;
+        flex-wrap: wrap;
+      }
+
+      .step-indicator .step {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+        background-color: #e0e0e0;
+        color: #888;
+        transition: all 0.3s;
+      }
+
+      .step-indicator .step.active {
+        background-color: #667eea;
+        color: white;
+      }
+
+      .step-indicator .step.done {
+        background-color: #27ae60;
+        color: white;
+      }
+
+      .step-indicator .step.error {
+        background-color: #e74c3c;
+        color: white;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button:hover {
+        background-color: #5568d3;
+      }
+
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .btn-group {
+        margin-top: 12px;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+      }
+
+      .btn-secondary:hover {
+        background-color: #565e64;
+      }
+
+      .btn-danger {
+        background-color: #e74c3c;
+      }
+
+      .btn-danger:hover {
+        background-color: #c0392b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>API 클라이언트 만들기</h1>
+      <p class="description">
+        매번 fetch를 반복 작성하는 대신, 재사용 가능한 API 함수를 만들어 봅니다.<br />
+        불편함 → GET 함수 → CRUD 객체 → 공통 request 함수 → 에러 처리 순서로 단계적으로 발전시킵니다.
+      </p>
+
+      <!-- 섹션 1: 반복의 불편함 느끼기 -->
+      <div class="section">
+        <h2>섹션 1: 반복의 불편함 느끼기</h2>
+        <p>같은 패턴의 fetch 코드를 3번 반복합니다. 불편함을 직접 체감해보세요.</p>
+        <div class="warning-box">
+          ⚠️ 이 코드는 <strong>일부러 반복적으로</strong> 작성합니다. "이거 함수로 만들면 편하겠다"를 느끼는 게 목적입니다.
+        </div>
+        <div class="log-area" id="log1">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test1()">테스트 1: 반복 fetch 3연발</button>
+          <button class="btn-secondary" onclick="clearLog('log1')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 2: GET 함수 만들기 -->
+      <div class="section">
+        <h2>섹션 2: GET 함수 만들기</h2>
+        <p>반복되는 fetch + ok 체크 + json 파싱을 하나의 함수로 묶습니다.</p>
+        <div class="info-box">
+          💡 <code>get(endpoint)</code> 함수 하나만 만들면 9줄이 3줄로 줄어듭니다.<br />
+          바뀌는 건 URL뿐이니까, URL만 인자로 받으면 됩니다.
+        </div>
+        <div class="log-area" id="log2">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test2()">테스트 2: get() 함수로 조회</button>
+          <button class="btn-secondary" onclick="clearLog('log2')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 3: CRUD api 객체 만들기 -->
+      <div class="section">
+        <h2>섹션 3: CRUD api 객체 만들기</h2>
+        <p>GET뿐 아니라 POST, PUT, DELETE까지 하나의 api 객체에 모아봅니다.</p>
+        <div class="info-box">
+          💡 <code>api.get()</code>, <code>api.post()</code>, <code>api.put()</code>, <code>api.delete()</code><br />
+          REST API 설계가 코드에 그대로 드러나는 패턴입니다.
+        </div>
+        <div class="step-indicator" id="step3">
+          <span class="step" id="step3-get">GET</span>
+          <span class="step" id="step3-post">POST</span>
+          <span class="step" id="step3-put">PUT</span>
+          <span class="step" id="step3-delete">DELETE</span>
+        </div>
+        <div class="log-area" id="log3">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test3()">테스트 3: api 객체로 CRUD</button>
+          <button class="btn-secondary" onclick="clearLog('log3'); resetSteps('step3')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 4: 공통 request 함수로 리팩터링 -->
+      <div class="section">
+        <h2>섹션 4: 공통 request 함수로 리팩터링</h2>
+        <p>api 객체 내부의 반복(fetch → ok 체크 → json)을 공통 request 함수로 뽑아냅니다.</p>
+        <div class="info-box">
+          💡 외부에서 쓰는 방식은 동일합니다. <strong>내부 구조만</strong> 깔끔해집니다.
+        </div>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <h4>Before (각 메서드가 fetch 직접 호출)</h4>
+            <div class="output" id="section4-before">테스트를 실행하면 비교됩니다.</div>
+          </div>
+          <div class="compare-col">
+            <h4>After (request 함수 재사용)</h4>
+            <div class="output" id="section4-after">테스트를 실행하면 비교됩니다.</div>
+          </div>
+        </div>
+        <div class="log-area" id="log4">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test4()">테스트 4: request 함수 사용</button>
+          <button class="btn-secondary" onclick="clearLog('log4')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 5: fetch 에러 처리의 함정 -->
+      <div class="section">
+        <h2>섹션 5: fetch 에러 처리의 함정</h2>
+        <p>fetch는 404, 500에서도 에러를 던지지 않습니다. 네트워크 에러 vs HTTP 에러의 차이를 체험합니다.</p>
+        <div class="warning-box">
+          ⚠️ <strong>fetch의 함정:</strong> 서버가 "없어요"라고 대답한 것도 "대답"이기 때문에 fetch는 에러를 안 던집니다!<br />
+          <code>response.ok</code>를 반드시 체크해야 합니다.
+        </div>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <h4>response.ok 체크 없이</h4>
+            <div class="output" id="section5-without">테스트를 실행하면 결과가 표시됩니다.</div>
+          </div>
+          <div class="compare-col">
+            <h4>response.ok 체크 있음</h4>
+            <div class="output" id="section5-with">테스트를 실행하면 결과가 표시됩니다.</div>
+          </div>
+        </div>
+        <div class="log-area" id="log5">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test5()">테스트 5: 에러 처리 비교</button>
+          <button class="btn-secondary" onclick="clearLog('log5')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 6: 상태코드별 메시지 + 타임아웃 -->
+      <div class="section">
+        <h2>섹션 6: 상태코드별 메시지 + 타임아웃</h2>
+        <p>에러 상태코드에 따라 친절한 메시지를 보여주고, 느린 응답에는 시간 제한을 겁니다.</p>
+        <div class="loading-spinner" id="loading6">⏳ 요청 중...</div>
+        <div class="result-box">
+          <div class="label">에러 메시지</div>
+          <div id="section6-result">테스트 버튼을 눌러 에러 메시지를 확인하세요.</div>
+        </div>
+        <div class="log-area" id="log6">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test6a()">테스트 6-1: 상태코드별 메시지</button>
+          <button onclick="test6b()">테스트 6-2: 타임아웃 (3초)</button>
+          <button class="btn-secondary" onclick="clearLog('log6')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 7: 종합 실습 - 완성된 API 클라이언트 -->
+      <div class="section">
+        <h2>섹션 7: 종합 실습 — 완성된 API 클라이언트</h2>
+        <p>지금까지 만든 기능(CRUD + 에러 처리 + 상태코드 메시지)을 모두 합쳐 완성된 API 클라이언트를 만듭니다.</p>
+        <div class="loading-spinner" id="loading7">⏳ API 클라이언트 테스트 중...</div>
+        <div class="step-indicator" id="step7">
+          <span class="step" id="step7-get">1. GET 조회</span>
+          <span class="step" id="step7-post">2. POST 생성</span>
+          <span class="step" id="step7-put">3. PUT 수정</span>
+          <span class="step" id="step7-del">4. DELETE 삭제</span>
+          <span class="step" id="step7-err">5. 에러 처리</span>
+        </div>
+        <div class="card-grid" id="user-grid">
+          <div class="user-card"><span style="color: #ccc;">테스트 버튼을 눌러주세요</span></div>
+        </div>
+        <div class="log-area" id="log7">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test7()">테스트 7: API 클라이언트 종합 테스트</button>
+          <button class="btn-secondary" onclick="clearLog('log7'); resetSteps('step7')">로그 초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

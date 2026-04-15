@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>외부 라이브러리 사용 실습</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+      }
+
+      .section h2 {
+        margin-bottom: 12px;
+        color: #667eea;
+      }
+
+      .section > p {
+        margin-bottom: 8px;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .info-box {
+        background-color: #f0f4ff;
+        border-left: 4px solid #667eea;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .info-box code {
+        background-color: #e8ecf8;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+
+      .warning-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .file-tree {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        margin: 12px 0;
+        white-space: pre;
+      }
+
+      .before-code {
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 12px 0;
+        white-space: pre-wrap;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .expected-output {
+        background-color: #1e1e1e;
+        color: #4ec9b0;
+        padding: 16px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        margin: 12px 0;
+        white-space: pre-wrap;
+      }
+
+      .expected-output .comment {
+        color: #6a9955;
+      }
+
+      .compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0;
+        font-size: 14px;
+      }
+
+      .compare-table th,
+      .compare-table td {
+        border: 1px solid #e0e0e0;
+        padding: 10px 14px;
+        text-align: left;
+      }
+
+      .compare-table th {
+        background-color: #667eea;
+        color: white;
+      }
+
+      .compare-table tr:nth-child(even) {
+        background-color: #f8f9ff;
+      }
+
+      .compare-table code {
+        background-color: #e8ecf8;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>외부 라이브러리 사용 실습</h1>
+      <p class="description">
+        <code>npm</code>으로 외부 패키지를 설치하고, <code>import</code>로 가져와서 사용하는 실습입니다.<br />
+        이 실습은 <strong>터미널(명령어)</strong>에서 진행합니다. 각 단계의 안내를 따라 진행하세요.
+      </p>
+
+      <!-- 사전 준비 -->
+      <div class="section">
+        <h2>사전 준비: Node.js 설치 확인</h2>
+        <p>터미널을 열고 아래 명령어를 입력하여 Node.js가 설치되어 있는지 확인합니다.</p>
+        <div class="before-code">node --version
+npm --version</div>
+        <div class="info-box">
+          버전 번호(예: <code>v20.x.x</code>, <code>10.x.x</code>)가 나오면 설치된 것입니다!<br />
+          설치가 안 되어 있다면 <strong>https://nodejs.org</strong> 에서 LTS 버전을 설치하세요.
+        </div>
+      </div>
+
+      <!-- 파일 구조 안내 -->
+      <div class="section">
+        <h2>파일 구조</h2>
+        <p>이번 실습에서 작업할 파일들입니다.</p>
+        <div class="file-tree">3_npm-package/
+├── index.html              ← 지금 보고 있는 파일 (안내용)
+├── package.json            ← 프로젝트 설정 파일 (npm init으로 생성)
+├── main.js                 ← 메인 실행 파일
+├── date-utils.js           ← 날짜 유틸리티 (dayjs 사용)
+└── fake-data.js            ← 가짜 데이터 생성 (@faker-js/faker 사용)
+</div>
+        <div class="warning-box">
+          이 실습은 브라우저가 아닌 <strong>터미널</strong>에서 실행합니다!<br />
+          터미널에서 <code>node main.js</code> 명령어로 결과를 확인하세요.
+        </div>
+      </div>
+
+      <!-- 섹션 1: 프로젝트 초기화 -->
+      <div class="section">
+        <h2>섹션 1: 프로젝트 초기화</h2>
+        <p>터미널에서 이 폴더(<code>3_npm-package</code>)로 이동한 뒤 아래 명령어를 실행하세요.</p>
+        <div class="before-code"><span class="comment"># 이 폴더(3_npm-package)에서 실행</span>
+npm init -y</div>
+        <p><code>package.json</code> 파일이 생성됩니다. 생성된 파일을 열고 아래 내용을 추가하세요.</p>
+        <div class="info-box">
+          <code>package.json</code>에 <code>"type": "module"</code>을 추가해야 <code>import</code>/<code>export</code> 문법을 사용할 수 있어요!<br /><br />
+          <strong>수정 전:</strong> <code>"main": "index.js",</code><br />
+          <strong>수정 후:</strong> <code>"main": "index.js",</code> 아래에 <code>"type": "module",</code> 추가
+        </div>
+        <p>수정 후 package.json은 이렇게 되어야 합니다 (핵심 부분만):</p>
+        <div class="before-code">{
+  "name": "3_npm-package",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  ...
+}</div>
+      </div>
+
+      <!-- 섹션 2: 패키지 설치 -->
+      <div class="section">
+        <h2>섹션 2: 패키지 설치</h2>
+        <p>터미널에서 아래 명령어로 2개의 패키지를 설치하세요.</p>
+        <div class="before-code"><span class="comment"># dayjs: 날짜를 쉽게 다루는 패키지</span>
+<span class="comment"># @faker-js/faker: 가짜 데이터를 생성하는 패키지</span>
+npm install dayjs @faker-js/faker</div>
+        <p>설치가 완료되면 아래 변화를 확인해보세요.</p>
+        <div class="info-box">
+          <strong>확인할 것 3가지:</strong><br />
+          1. <code>node_modules</code> 폴더가 생겼나요? (패키지가 실제로 저장되는 곳)<br />
+          2. <code>package-lock.json</code> 파일이 생겼나요? (정확한 버전 기록)<br />
+          3. <code>package.json</code>의 <code>dependencies</code>에 dayjs, @faker-js/faker가 추가되었나요?
+        </div>
+
+        <table class="compare-table">
+          <tr>
+            <th>파일/폴더</th>
+            <th>역할</th>
+            <th>Git에 올리나요?</th>
+          </tr>
+          <tr>
+            <td><code>node_modules/</code></td>
+            <td>패키지 실제 코드가 저장되는 곳</td>
+            <td>올리지 않음 (용량이 큼)</td>
+          </tr>
+          <tr>
+            <td><code>package.json</code></td>
+            <td>프로젝트 설정 + 설치된 패키지 목록</td>
+            <td>올림</td>
+          </tr>
+          <tr>
+            <td><code>package-lock.json</code></td>
+            <td>설치된 패키지의 정확한 버전 기록</td>
+            <td>올림</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- 섹션 3: dayjs 사용하기 -->
+      <div class="section">
+        <h2>섹션 3: dayjs 사용하기 — date-utils.js</h2>
+        <p><code>date-utils.js</code>를 열고 TODO를 완성하세요.</p>
+        <div class="info-box">
+          설치한 패키지는 <strong>경로 없이 이름만</strong> 써서 import 합니다!<br />
+          <code>import dayjs from 'dayjs';</code> (경로 <code>./</code> 없음!)<br /><br />
+          <strong>dayjs 주요 사용법:</strong><br />
+          <code>dayjs()</code> — 현재 날짜/시간 객체 생성<br />
+          <code>.format('YYYY-MM-DD')</code> — 원하는 형식으로 날짜 출력<br />
+          <code>.add(숫자, 'day')</code> — 날짜 더하기<br />
+          <code>.subtract(숫자, 'day')</code> — 날짜 빼기
+        </div>
+        <p>완성 후 기대하는 출력 결과:</p>
+        <div class="expected-output"><span class="comment">// 실행: node main.js</span>
+
+=== dayjs 테스트 ===
+오늘 날짜: 2026년 04월 15일   <span class="comment">← 실행한 날에 따라 다름</span>
+100일 뒤: 2026-07-24          <span class="comment">← 실행한 날에 따라 다름</span>
+7일 전: 2026-04-08            <span class="comment">← 실행한 날에 따라 다름</span></div>
+      </div>
+
+      <!-- 섹션 4: faker 사용하기 -->
+      <div class="section">
+        <h2>섹션 4: @faker-js/faker 사용하기 — fake-data.js</h2>
+        <p><code>fake-data.js</code>를 열고 TODO를 완성하세요.</p>
+        <div class="info-box">
+          @faker-js/faker 패키지에서 <code>faker</code> 객체를 가져옵니다. (named export)<br />
+          <code>import { faker } from '@faker-js/faker';</code><br /><br />
+          <strong>faker 주요 사용법:</strong><br />
+          <code>faker.person.fullName()</code> — 가짜 이름 생성<br />
+          <code>faker.internet.email()</code> — 가짜 이메일 생성<br />
+          <code>faker.commerce.productName()</code> — 가짜 상품명 생성<br />
+          <code>faker.commerce.price()</code> — 가짜 가격 생성
+        </div>
+        <p>완성 후 기대하는 출력 결과:</p>
+        <div class="expected-output"><span class="comment">// 실행: node main.js</span>
+
+=== faker 테스트 ===
+--- 가짜 유저 1명 ---
+  이름: John Smith               <span class="comment">← 매번 다른 값</span>
+  이메일: john.smith@example.com  <span class="comment">← 매번 다른 값</span>
+  전화번호: +1-555-123-4567      <span class="comment">← 매번 다른 값</span>
+  아바타: https://avatars...      <span class="comment">← 매번 다른 값</span>
+
+--- 가짜 상품 1개 ---
+  상품명: Handmade Wooden Chair  <span class="comment">← 매번 다른 값</span>
+  가격: 45000원                  <span class="comment">← 매번 다른 값</span>
+  카테고리: Electronics           <span class="comment">← 매번 다른 값</span>
+  설명: A beautiful product...   <span class="comment">← 매번 다른 값</span></div>
+      </div>
+
+      <!-- 섹션 5: 모듈 조합 -->
+      <div class="section">
+        <h2>섹션 5: 모듈 조합하기 — main.js</h2>
+        <p><code>main.js</code>를 열고 TODO를 완성하세요.</p>
+        <p>직접 만든 모듈(date-utils.js, fake-data.js)을 함께 사용합니다.</p>
+        <div class="info-box">
+          <strong>import 비교:</strong><br />
+          우리가 만든 모듈: <code>import { getToday } from './date-utils.js';</code> — 경로 <code>./</code> 필요!<br />
+          설치한 패키지: <code>import dayjs from 'dayjs';</code> — 경로 없이 이름만!
+        </div>
+        <p>모든 TODO를 완성한 뒤 터미널에서 실행하세요:</p>
+        <div class="before-code">node main.js</div>
+        <p>기대하는 최종 출력 결과:</p>
+        <div class="expected-output">=== dayjs 테스트 ===
+오늘 날짜: 2026년 04월 15일
+100일 뒤: 2026-07-24
+7일 전: 2026-04-08
+
+=== faker 테스트 ===
+--- 가짜 유저 1명 ---
+  이름: John Smith
+  이메일: john.smith@example.com
+  전화번호: +1-555-123-4567
+  아바타: https://avatars...
+
+--- 가짜 상품 1개 ---
+  상품명: Handmade Wooden Chair
+  가격: 45000원
+  카테고리: Electronics
+  설명: A beautiful product...
+
+=== 모듈 조합 테스트 ===
+가짜 유저 3명의 가입일을 생성합니다:
+  1. Alice Johnson (alice@...) — 가입일: 2026년 04월 15일
+  2. Bob Wilson (bob@...) — 가입일: 2026년 04월 15일
+  3. Carol Davis (carol@...) — 가입일: 2026년 04월 15일
+
+전체 테스트 완료!</div>
+      </div>
+
+      <!-- 참고: npm 명령어 치트시트 -->
+      <div class="section">
+        <h2>참고: npm 명령어 치트시트</h2>
+        <table class="compare-table">
+          <tr>
+            <th>명령어</th>
+            <th>설명</th>
+            <th>예시</th>
+          </tr>
+          <tr>
+            <td><code>npm init -y</code></td>
+            <td>프로젝트 초기화 (package.json 생성)</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><code>npm install 패키지</code></td>
+            <td>패키지 설치</td>
+            <td><code>npm install dayjs</code></td>
+          </tr>
+          <tr>
+            <td><code>npm i 패키지</code></td>
+            <td>패키지 설치 (약어)</td>
+            <td><code>npm i dayjs @faker-js/faker</code></td>
+          </tr>
+          <tr>
+            <td><code>npm install</code></td>
+            <td>package.json 기반 전체 설치</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td><code>npm uninstall 패키지</code></td>
+            <td>패키지 제거</td>
+            <td><code>npm uninstall dayjs</code></td>
+          </tr>
+          <tr>
+            <td><code>node 파일이름</code></td>
+            <td>JS 파일 실행</td>
+            <td><code>node main.js</code></td>
+          </tr>
+        </table>
+        <div class="info-box">
+          <strong>import 구분법:</strong><br />
+          우리가 만든 모듈 → <code>import { add } from './utils.js';</code> (경로 <code>./</code> 필요)<br />
+          설치한 패키지 → <code>import dayjs from 'dayjs';</code> (이름만!)
+        </div>
+      </div>
+
+    </div>
+  </body>
+</html>

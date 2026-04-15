@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>데이터 가져오기 (fetch GET)</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+      }
+
+      .section h2 {
+        margin-bottom: 12px;
+        color: #667eea;
+      }
+
+      .section > p {
+        margin-bottom: 8px;
+        color: #555;
+        line-height: 1.6;
+      }
+
+      .info-box {
+        background-color: #f0f4ff;
+        border-left: 4px solid #667eea;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .info-box code {
+        background-color: #e8ecf8;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 13px;
+      }
+
+      .warning-box {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 12px 16px;
+        margin: 12px 0;
+        border-radius: 0 8px 8px 0;
+        font-size: 14px;
+        color: #444;
+        line-height: 1.6;
+      }
+
+      .log-area {
+        min-height: 120px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .result-box {
+        min-height: 60px;
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        line-height: 1.8;
+        font-size: 15px;
+        color: #333;
+      }
+
+      .result-box .label {
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 8px;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+        margin: 16px 0;
+      }
+
+      .user-card {
+        padding: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.3s;
+      }
+
+      .user-card.loaded {
+        border-color: #667eea;
+        background-color: #f8f9ff;
+      }
+
+      .user-card .name {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .user-card .email {
+        font-size: 13px;
+        color: #888;
+        margin-top: 4px;
+      }
+
+      .user-card .detail {
+        font-size: 13px;
+        color: #666;
+        margin-top: 4px;
+      }
+
+      .user-card .placeholder {
+        color: #ccc;
+        font-size: 14px;
+      }
+
+      .post-list {
+        margin: 16px 0;
+      }
+
+      .post-item {
+        padding: 12px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        transition: all 0.3s;
+      }
+
+      .post-item.loaded {
+        border-color: #667eea;
+        background-color: #f8f9ff;
+      }
+
+      .post-item .post-title {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 4px;
+      }
+
+      .post-item .post-body {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.5;
+      }
+
+      .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 12px;
+        color: #667eea;
+        font-weight: bold;
+      }
+
+      .loading-spinner.show {
+        display: block;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      button:hover {
+        background-color: #5568d3;
+      }
+
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .btn-group {
+        margin-top: 12px;
+      }
+
+      .btn-secondary {
+        background-color: #6c757d;
+      }
+
+      .btn-secondary:hover {
+        background-color: #565e64;
+      }
+
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 10px 0;
+      }
+
+      .compare-grid .compare-col {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .compare-grid .compare-col h4 {
+        margin-bottom: 8px;
+        color: #667eea;
+      }
+
+      .compare-grid .compare-col .output {
+        font-family: "Courier New", Courier, monospace;
+        font-size: 13px;
+        white-space: pre-wrap;
+        word-break: break-all;
+        background: #f5f5f5;
+        padding: 8px;
+        border-radius: 4px;
+        min-height: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>데이터 가져오기 (fetch GET)</h1>
+      <p class="description">
+        fetch()는 브라우저에 내장된 HTTP 요청 함수입니다. 별도 설치 없이 사용할 수 있고, Promise를 반환합니다.<br />
+        이 실습에서는 JSONPlaceholder API를 사용하여 사용자, 게시물, 댓글 데이터를 가져오는 연습을 합니다.
+      </p>
+
+      <!-- API 안내 -->
+      <div class="section">
+        <h2>📦 사용할 API: JSONPlaceholder</h2>
+        <p>무료 테스트용 REST API입니다. 실습에서 아래 엔드포인트를 사용합니다.</p>
+        <div class="info-box">
+          <code>GET /users</code> → 사용자 목록 (10명)<br />
+          <code>GET /users/:id</code> → 특정 사용자 1명<br />
+          <code>GET /posts</code> → 게시물 목록 (100개)<br />
+          <code>GET /posts?userId=N</code> → 특정 사용자의 게시물<br />
+          <code>GET /comments?postId=N</code> → 특정 게시물의 댓글<br />
+          <br />
+          기본 URL: <code>https://jsonplaceholder.typicode.com</code>
+        </div>
+      </div>
+
+      <!-- 섹션 1: fetch 기본 - then/catch -->
+      <div class="section">
+        <h2>섹션 1: fetch 기본 — then/catch</h2>
+        <p>fetch()는 Promise를 반환합니다. .then()으로 응답을 받고, .json()으로 데이터를 파싱합니다.</p>
+        <div class="info-box">
+          💡 fetch()의 반환값은 Response 객체입니다. 데이터를 사용하려면 <code>response.json()</code>으로 한 번 더 파싱해야 해요.
+        </div>
+        <div class="log-area" id="log1">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test1()">테스트 1: 사용자 1명 가져오기</button>
+          <button class="btn-secondary" onclick="clearLog('log1')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 2: Response 객체 살펴보기 -->
+      <div class="section">
+        <h2>섹션 2: Response 객체 살펴보기</h2>
+        <p>fetch가 반환하는 Response 객체에는 상태 코드, 헤더 등 유용한 정보가 담겨 있습니다.</p>
+        <div class="warning-box">
+          ⚠️ <strong>response.ok</strong>는 상태 코드가 200~299일 때 true입니다. 404 등의 에러에서도 fetch 자체는 실패하지 않으므로, 반드시 response.ok를 확인해야 합니다!
+        </div>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <h4>성공 응답 (ID: 1)</h4>
+            <div class="output" id="section2-success">테스트 버튼을 눌러 확인하세요.</div>
+          </div>
+          <div class="compare-col">
+            <h4>실패 응답 (ID: 9999)</h4>
+            <div class="output" id="section2-fail">테스트 버튼을 눌러 확인하세요.</div>
+          </div>
+        </div>
+        <div class="log-area" id="log2">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test2()">테스트 2: Response 객체 비교</button>
+          <button class="btn-secondary" onclick="clearLog('log2')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 3: async/await로 데이터 가져오기 -->
+      <div class="section">
+        <h2>섹션 3: async/await로 데이터 가져오기</h2>
+        <p>then() 체인 대신 async/await를 사용하면 코드가 훨씬 읽기 쉬워집니다.</p>
+        <div class="info-box">
+          💡 <code>async function</code> 안에서 <code>await</code>를 사용하면, Promise가 완료될 때까지 기다린 뒤 결과값을 바로 받을 수 있어요.
+        </div>
+        <div class="result-box">
+          <div class="label">사용자 정보</div>
+          <div id="section3-result">테스트 버튼을 눌러 사용자 정보를 가져오세요.</div>
+        </div>
+        <div class="log-area" id="log3">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test3()">테스트 3: async/await로 사용자 조회</button>
+          <button class="btn-secondary" onclick="clearLog('log3')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 4: 에러 처리 (try/catch + response.ok) -->
+      <div class="section">
+        <h2>섹션 4: 에러 처리 — try/catch + response.ok</h2>
+        <p>네트워크 에러와 HTTP 에러를 모두 처리하는 안전한 fetch 패턴을 연습합니다.</p>
+        <div class="loading-spinner" id="loading4">⏳ 로딩 중...</div>
+        <div class="log-area" id="log4">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test4a()">테스트 4-1: 성공 (ID: 1)</button>
+          <button onclick="test4b()">테스트 4-2: 실패 (ID: 9999)</button>
+          <button class="btn-secondary" onclick="clearLog('log4')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 5: 목록 데이터 가져오기 -->
+      <div class="section">
+        <h2>섹션 5: 목록 데이터 가져오기</h2>
+        <p>전체 사용자 목록을 가져와서 화면에 카드로 표시합니다.</p>
+        <div class="loading-spinner" id="loading5">⏳ 사용자 목록 로딩 중...</div>
+        <div class="card-grid" id="user-grid">
+          <div class="user-card"><span class="placeholder">테스트 버튼을 눌러주세요</span></div>
+        </div>
+        <div class="log-area" id="log5">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test5()">테스트 5: 전체 사용자 목록</button>
+          <button class="btn-secondary" onclick="clearLog('log5')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 6: 쿼리 파라미터로 필터링 -->
+      <div class="section">
+        <h2>섹션 6: 쿼리 파라미터로 필터링</h2>
+        <p>URL 쿼리 파라미터를 사용하여 특정 사용자의 게시물을 가져옵니다.</p>
+        <div class="info-box">
+          💡 <code>?userId=1</code> 처럼 URL 뒤에 파라미터를 붙여 서버에 조건을 전달할 수 있어요.
+          <code>URLSearchParams</code>를 사용하면 더 깔끔하게 작성할 수 있습니다.
+        </div>
+        <div class="loading-spinner" id="loading6">⏳ 게시물 로딩 중...</div>
+        <div class="post-list" id="post-list">
+          <div class="post-item"><span class="placeholder">테스트 버튼을 눌러 게시물을 가져오세요.</span></div>
+        </div>
+        <div class="log-area" id="log6">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test6a()">테스트 6-1: 사용자 1의 게시물</button>
+          <button onclick="test6b()">테스트 6-2: URLSearchParams 활용</button>
+          <button class="btn-secondary" onclick="clearLog('log6')">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 7: 종합 실습 - 게시물 + 댓글 조합 -->
+      <div class="section">
+        <h2>섹션 7: 종합 실습 — 게시물 + 댓글 조합</h2>
+        <p>특정 사용자의 게시물을 가져온 뒤, 첫 번째 게시물의 댓글까지 함께 가져오는 종합 실습입니다.</p>
+        <div class="loading-spinner" id="loading7">⏳ 데이터 로딩 중...</div>
+        <div class="result-box">
+          <div class="label">종합 결과</div>
+          <div id="section7-result">테스트 버튼을 눌러 결과를 확인하세요.</div>
+        </div>
+        <div class="log-area" id="log7">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test7()">테스트 7: 게시물 + 댓글 조합</button>
+          <button class="btn-secondary" onclick="clearLog('log7')">로그 초기화</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>타이머 함수와 콜백</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+        padding: 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+      }
+
+      .section h2 {
+        margin-bottom: 12px;
+        color: #667eea;
+      }
+
+      .result-box {
+        min-height: 60px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        line-height: 1.8;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .timer-display {
+        font-size: 48px;
+        font-weight: bold;
+        color: #667eea;
+        text-align: center;
+        padding: 20px;
+        margin: 16px 0;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        min-height: 90px;
+      }
+
+      .log-area {
+        min-height: 120px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        margin: 16px 0;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        white-space: pre-wrap;
+      }
+
+      .progress-bar-container {
+        width: 100%;
+        height: 30px;
+        background-color: #e0e0e0;
+        border-radius: 15px;
+        overflow: hidden;
+        margin: 16px 0;
+      }
+
+      .progress-bar {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 15px;
+        transition: width 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+      }
+
+      .traffic-light {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin: 16px 0;
+      }
+
+      .light {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+      }
+
+      button {
+        padding: 10px 20px;
+        margin: 5px;
+        background-color: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #5568d3;
+      }
+
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+
+      .btn-group {
+        margin-top: 12px;
+      }
+
+      .btn-danger {
+        background-color: #e74c3c;
+      }
+
+      .btn-danger:hover {
+        background-color: #c0392b;
+      }
+
+      
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>타이머 함수와 콜백</h1>
+
+      <!-- 섹션 1: 콜백 함수 기초 -->
+      <div class="section">
+        <h2>섹션 1: 콜백 함수 기초</h2>
+        <p>다른 함수에 인자로 전달되는 함수(콜백)를 직접 만들어봅니다.</p>
+        <div class="result-box" id="result1">여기에 결과가 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test1()">테스트 1: 콜백 함수 실행</button>
+        </div>
+      </div>
+
+      <!-- 섹션 2: setTimeout 기본 -->
+      <div class="section">
+        <h2>섹션 2: setTimeout 기본</h2>
+        <p>지정한 시간 후에 콜백 함수가 실행됩니다.</p>
+        <div class="result-box" id="result2">⏳ 버튼을 누르고 기다려보세요.</div>
+        <div class="btn-group">
+          <button onclick="test2()">테스트 2: 2초 후 메시지</button>
+        </div>
+      </div>
+
+      <!-- 섹션 3: 실행 순서 이해 -->
+      <div class="section">
+        <h2>섹션 3: 실행 순서 이해</h2>
+        <p>setTimeout이 있을 때 코드의 실행 순서를 확인합니다.</p>
+        <div class="log-area" id="log3">콘솔 로그가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test3()">테스트 3: 실행 순서 확인</button>
+          <button onclick="clearLog3()">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 4: 카운트다운 타이머 -->
+      <div class="section">
+        <h2>섹션 4: 카운트다운 타이머 (setInterval)</h2>
+        <p>setInterval로 1초마다 반복 실행하여 카운트다운을 구현합니다.</p>
+        <div class="timer-display" id="timer4">10</div>
+        <div class="btn-group">
+          <button onclick="test4()" id="btn-countdown">테스트 4: 카운트다운 시작</button>
+          <button onclick="resetTimer4()">리셋</button>
+        </div>
+      </div>
+
+      <!-- 섹션 5: 프로그레스 바 -->
+      <div class="section">
+        <h2>섹션 5: 프로그레스 바 (setInterval + clearInterval)</h2>
+        <p>setInterval로 프로그레스 바를 채우고, 100%가 되면 clearInterval로 멈춥니다.</p>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progress-bar">0%</div>
+        </div>
+        <div class="btn-group">
+          <button onclick="test5()" id="btn-progress">테스트 5: 프로그레스 시작</button>
+          <button onclick="resetProgress()">리셋</button>
+        </div>
+      </div>
+
+      <!-- 섹션 6: 콜백으로 순서 제어 -->
+      <div class="section">
+        <h2>섹션 6: 콜백으로 순서 제어</h2>
+        <p>콜백 함수를 사용하여 비동기 작업을 순서대로 실행합니다.</p>
+        <div class="log-area" id="log6">작업 로그가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test6()">테스트 6: 순차 작업 실행</button>
+          <button onclick="clearLog6()">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 7: 콜백에 인자 전달 -->
+      <div class="section">
+        <h2>섹션 7: 콜백에 인자 전달</h2>
+        <p>비동기 함수가 완료된 후, 결과 데이터를 콜백 함수의 인자로 전달합니다.</p>
+        <div class="log-area" id="log7">결과가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test7()">테스트 7: 사용자 정보 조회</button>
+          <button onclick="clearLog7()">로그 초기화</button>
+        </div>
+      </div>
+
+      <!-- 섹션 8: 신호등 (종합 실습) -->
+      <div class="section">
+        <h2>섹션 8: 신호등 (종합 실습)</h2>
+        <p>setTimeout과 콜백을 조합하여 신호등을 순서대로 점등합니다.</p>
+        <div class="traffic-light">
+          <div class="light" id="light-red">빨강</div>
+          <div class="light" id="light-yellow">노랑</div>
+          <div class="light" id="light-green">초록</div>
+        </div>
+        <div class="log-area" id="log8">신호등 로그가 여기에 표시됩니다.</div>
+        <div class="btn-group">
+          <button onclick="test8()" id="btn-traffic">테스트 8: 신호등 시작</button>
+          <button onclick="resetTraffic()">리셋</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
