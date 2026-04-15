@@ -5,6 +5,6 @@
 // hint: function 앞에 export default 키워드를 추가하면 됩니다.
 // 예시: export default function 함수이름(매개변수) { ... }
 
-function greet(name) {
+export default function greet(name) {
   return `안녕하세요, ${name}님!`;
 }

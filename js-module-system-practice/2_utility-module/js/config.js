@@ -11,3 +11,5 @@ const siteConfig = {
   theme: "dark",
   language: "ko",
 };
+
+export default siteConfig;

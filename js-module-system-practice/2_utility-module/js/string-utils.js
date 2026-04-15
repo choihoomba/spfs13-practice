@@ -8,16 +8,16 @@
 // hint: export function toUpperCase(...) { ... }
 
 // 대표 함수: 성과 이름을 합쳐서 "홍길동" 형태로 만드는 함수
-function formatName(firstName, lastName) {
+export default function formatName(firstName, lastName) {
   return `${lastName}${firstName}`;
 }
 
 // 보조 함수: 문자열을 대문자로 변환
-function toUpperCase(str) {
+export function toUpperCase(str) {
   return str.toUpperCase();
 }
 
 // 보조 함수: 문자열 끝에 느낌표를 추가
-function addExclamation(str) {
+export function addExclamation(str) {
   return str + "!";
 }

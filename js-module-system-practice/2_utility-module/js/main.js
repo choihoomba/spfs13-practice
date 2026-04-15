@@ -3,18 +3,18 @@
 
 // TODO 1: greet.js에서 greet 함수를 import 하세요. (default export)
 // hint: import 함수이름 from './파일.js'; (중괄호 없이!)
-
+import greet from "./greet.js";
 // TODO 2: config.js에서 설정 객체를 import 하세요. (default export)
 // hint: default export는 이름을 자유롭게 정할 수 있어요.
 //       여기서는 siteConfig라는 이름으로 가져오세요.
-
+import siteConfig from "./config.js";
 // TODO 3: math-utils.js에서 add, subtract, multiply, PI를 import 하세요. (named export)
 // hint: import { 이름1, 이름2 } from './파일.js'; (중괄호 필요!)
-
+import { add, subtract, multiply, PI } from "./math-utils.js";
 // TODO 4: string-utils.js에서 formatName(default)과 toUpperCase, addExclamation(named)을 import 하세요.
 // hint: import 기본이름, { 이름1, 이름2 } from './파일.js';
 //       default가 앞에, named가 뒤에!
-
+import formatName, { toUpperCase, addExclamation } from "./string-utils.js";
 // ==========================================
 // 유틸: 로그 출력 헬퍼 (수정하지 마세요)
 // ==========================================

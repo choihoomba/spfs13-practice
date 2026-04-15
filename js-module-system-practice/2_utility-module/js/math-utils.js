@@ -6,16 +6,16 @@
 // 예시: export function add(a, b) { ... }
 // 예시: export const PI = 3.14;
 
-function add(a, b) {
+export function add(a, b) {
   return a + b;
 }
 
-function subtract(a, b) {
+export function subtract(a, b) {
   return a - b;
 }
 
-function multiply(a, b) {
+export function multiply(a, b) {
   return a * b;
 }
 
-const PI = 3.14159;
+export const PI = 3.14159;
